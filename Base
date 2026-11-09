@@ -1,0 +1,297 @@
+title Twirler
+author fortress-rhythm
+homepage https://fortress-rhythm.itch.io/
+
+color_palette famicom
+sprite_size 11
+
+========
+OBJECTS
+========
+Background .
+black
+
+Wall #
+white
+
+Turntable
+blue green white
+...00000...
+..0111110..
+.010000010.
+.012000010.
+01202022010
+01200200210
+01022020010
+.010020210.
+.010002210.
+..0111110..
+...00000...
+
+Turntable:active copy:Turntable
+blue green blue
+
+Turntable:passive copy:Turntable
+grey green grey
+
+Activated
+purple
+..0........
+...........
+...........
+...........
+...........
+...........
+...........
+...........
+...........
+...........
+...........
+
+Arrow
+black white blue green red
+...........
+.....1.....
+....111....
+.....1.....
+..4..1..3..
+.444403333.
+..4..2..3..
+.....2.....
+....222....
+.....2.....
+...........
+
+Arrow:u copy:Arrow
+white white transparent transparent transparent
+
+Arrow:d copy:Arrow
+white transparent white transparent transparent
+
+Arrow:r copy:Arrow
+white transparent transparent white transparent
+
+Arrow:l copy:Arrow
+white transparent transparent transparent white
+
+Player
+green white
+...........
+...00100...
+..0011100..
+..0001000..
+.000010010.
+.000011111.
+.000000010.
+..0000000..
+..0000000..
+...00000...
+...........
+
+Player:ur copy:Player 1
+
+Player:ul 2
+red white
+...........
+...00100...
+..0011100..
+..0001000..
+.010010000.
+.111110000.
+.010000000.
+..0000000..
+..0000000..
+...00000...
+...........
+
+Player:dr 3
+orange white
+...........
+...00000...
+..0000000..
+..0000000..
+.000000010.
+.000011111.
+.000010010.
+..0001000..
+..0011100..
+...00100...
+...........
+
+Player:dl 4
+yellow white
+...........
+...00000...
+..0000000..
+..0000000..
+.010000000.
+.111110000.
+.010010000.
+..0001000..
+..0011100..
+...00100...
+...........
+
+Rune:tag_moveset copy Player:tag_moveset
+transparent green
+
+Blocker
+yellow white gray orange red green
+...........
+..1111111..
+.144000441.
+10022022001
+10500000501
+10020402001
+10002520001
+.100000001.
+..1111111..
+...........
+...........
+
+Blocker:Asleep copy:Blocker S
+yellow white orange white yellow orange
+
+
+Blocker:Awake copy:Blocker W
+yellow white orange white orange yellow
+
+Giant_Left
+yellow white gray orange red green
+...11111111
+.1004000000
+10000440000
+10000000000
+10003004300
+10000344000
+10000000040
+10000030404
+10000003333
+.1100000000
+...11111111
+
+Giant_Left:sleep copy:Giant_Left G
+yellow white gray orange yellow yellow
+
+Giant_Left:awake copy:Giant_Left
+yellow white gray yellow red yellow
+
+Giant_Right
+yellow
+
+Giant_Right:sleep copy:Giant_right g
+yellow white gray orange yellow yellow
+
+
+Giant_Right:awake copy:Giant_Right
+yellow white gray yellow red yellow
+
+wall
+darkblue
+
+=======
+LEGEND
+=======
+
+(
+moveset = ur ul dr dl
+(tag_dir = u l r d ur ul dr dl)
+dir = u l r d
+
+
+Solid = Wall or Slag
+
+Squashes = Player or Debris or Wood:Flaming or Wood:Sparked
+Crates = Firework or Wood:Dry
+Moves = Crates or Squashes
+
+Relay = Relay:C or Relay:B or Relay:A
+Explosion = Explosion:C or Explosion:B or Explosion:A ( or Explosion:Debris )
+
+Spark = Explosion or Relay or Wood:Flaming
+
+Flammable = Wood:Dry
+Asbestos = Player or Slag or Wall
+Explosive = Firework
+
+
+R = Wall and Relay:B)
+(
+Background .
+Player 1 2 3 4
+Rune   5 6 7 8
+Firework !
+Wall #
+Receptacle o
+)
+obj = Player or Blocker (or Giant)
+
+
+=======
+SOUNDS
+=======
+
+================
+COLLISIONLAYERS
+================
+
+Background
+Turntable
+Player Wall Blocker (Giant_Left Giant_Right)
+Activated
+Arrow
+
+======
+RULES
+======
+(Basic Movement)
+(cf increpare's kettle)
+(4 direction sets: ur, ul, dr, dl)
+(eventually more. need a better way of extending this.)
+[up obj:dr] -> [obj:dr]
+[left obj:dr] -> [obj:dr]
+
+[up obj:dl] -> [obj:dl]
+[right obj:dl] -> [obj:dl]
+
+[down obj:ur] -> [obj:ur]
+[left obj:ur] -> [obj:ur]
+
+[down obj:ul] -> [obj:ul]
+[right obj:ul] -> [obj:ul]
+
+
+(Blockers)
+
+[Blocker:Awake] -> [down Blocker:Awake] (this might move more than I want it to...)
+[Blocker:Awake] -> [Blocker:Asleep]
+[Player | Blocker:Asleep] -> [Player | Blocker:Awake]
+
+(Turntables)
+(I could force turntable to fling you off at the first free spot. Actually more interesting than what I had planned, so let's.)
+( simpler turntable: activate by action )
+[obj:ur Action Turntable:passive] -> [obj:ul Turntable:passive]
+[obj:ul Action Turntable:passive] -> [obj:dl Turntable:passive]
+[obj:dl Action Turntable:passive] -> [obj:dr Turntable:passive]
+[obj:dr Action Turntable:passive] -> [obj:ur Turntable:passive]
+( alternative turntable: always on.)
+once [obj Turntable:active] -> [obj Activated Turntable:active]
+[obj:ur Activated Turntable:active] -> [obj:ul Turntable:active]
+[obj:ul Activated Turntable:active] -> [obj:dl Turntable:active]
+[obj:dl Activated Turntable:active] -> [obj:dr Turntable:active]
+[obj:dr Activated Turntable:active] -> [obj:ur Turntable:active]
+
+==============
+WINCONDITIONS
+==============
+all Player:tag_moveset on Rune:tag_runeset
+
+=======
+LEVELS
+=======
+
+message level 1 of 10
+.1.........
+...2..SSS..
+..A........
+.....P..3..
